@@ -1,0 +1,58 @@
+// Solidity Smart Contract (HealthInsuranceFraudDetection.sol)
+// Ensures security, transparency, and fraud prevention in health insurance claims
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HealthInsuranceFraudDetection {
+    struct Claim {
+        uint256 id;
+        string patientName;
+        string hospital;
+        uint256 amount;
+        string claimHash;
+        address claimant;
+        bool approved;
+    }
+
+    mapping(uint256 => Claim) public claims;
+    uint256 public claimCounter;
+    address public admin;
+
+    event ClaimSubmitted(uint256 claimId, address claimant);
+    event ClaimApproved(uint256 claimId, address approver);
+
+    constructor() {
+        admin = msg.sender;
+    }
+
+    function submitClaim(
+        string memory _patientName,
+        string memory _hospital,
+        uint256 _amount,
+        string memory _claimHash
+    ) public {
+        claimCounter++;
+        claims[claimCounter] = Claim(
+            claimCounter,
+            _patientName,
+            _hospital,
+            _amount,
+            _claimHash,
+            msg.sender,
+            false
+        );
+        emit ClaimSubmitted(claimCounter, msg.sender);
+    }
+
+    function approveClaim(uint256 _claimId) public {
+        require(msg.sender == admin, "Only admin can approve claims");
+        require(!claims[_claimId].approved, "Claim is already approved");
+        claims[_claimId].approved = true;
+        emit ClaimApproved(_claimId, msg.sender);
+    }
+
+    function getClaim(uint256 _claimId) public view returns (Claim memory) {
+        return claims[_claimId];
+    }
+}

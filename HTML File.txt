@@ -1,0 +1,46 @@
+/* HTML File (index.html) */
+<!-- Basic HTML for Health Insurance Claim System -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Insurance Fraud Detection</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Health Insurance Fraud Detection</h1>
+    <form id="claimForm">
+        <input type="text" id="patientName" placeholder="Patient Name" required>
+        <input type="text" id="hospital" placeholder="Hospital" required>
+        <input type="number" id="amount" placeholder="Claim Amount" required>
+        <input type="text" id="claimHash" placeholder="SHA-256 Hash" required>
+        <button type="submit">Submit Claim</button>
+    </form>
+    <script src="app.js"></script>
+</body>
+</html>
+
+/* CSS File (styles.css) */
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: auto;
+}
+input {
+    margin: 10px;
+    padding: 8px;
+    font-size: 16px;
+}
+button {
+    padding: 10px;
+    background-color: blue;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
