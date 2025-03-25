@@ -1,0 +1,73 @@
+// Solidity Smart Contract for Health Insurance Fraud Detection
+// Ensures transparency and security using Ethereum Blockchain
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HealthInsuranceFraudDetection {
+    struct Claim {
+        uint256 id;
+        string patientName;
+        string hospital;
+        uint256 amount;
+        string claimHash; // SHA-256 hash for data integrity
+        address claimant;
+        bool approved;
+    }
+
+    mapping(uint256 => Claim) public claims;
+    uint256 public claimCounter;
+    address public admin;
+
+    event ClaimSubmitted(uint256 claimId, address claimant);
+    event ClaimApproved(uint256 claimId, address approver);
+
+    constructor() {
+        admin = msg.sender; // Set contract deployer as admin
+    }
+
+    function submitClaim(string memory _patientName, string memory _hospital, uint256 _amount, string memory _claimHash) public {
+        claimCounter++;
+        claims[claimCounter] = Claim(claimCounter, _patientName, _hospital, _amount, _claimHash, msg.sender, false);
+        emit ClaimSubmitted(claimCounter, msg.sender);
+    }
+
+    function approveClaim(uint256 _claimId) public {
+        require(msg.sender == admin, "Only admin can approve claims");
+        require(!claims[_claimId].approved, "Claim is already approved");
+        claims[_claimId].approved = true;
+        emit ClaimApproved(_claimId, msg.sender);
+    }
+
+    function getClaim(uint256 _claimId) public view returns (Claim memory) {
+        return claims[_claimId];
+    }
+}
+
+// Web3.js Integration for interacting with the smart contract
+
+const Web3 = require('web3');
+const web3 = new Web3(Web3.givenProvider || 'http://localhost:8545');
+
+const contractABI = [ /* ABI from compiled contract */ ];
+const contractAddress = '0xYourContractAddressHere';
+const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+async function submitClaim(patientName, hospital, amount, claimHash, account) {
+    await contract.methods.submitClaim(patientName, hospital, amount, claimHash)
+        .send({ from: account });
+    console.log("Claim submitted successfully");
+}
+
+async function approveClaim(claimId, account) {
+    await contract.methods.approveClaim(claimId)
+        .send({ from: account });
+    console.log("Claim approved successfully");
+}
+
+async function getClaim(claimId) {
+    const claim = await contract.methods.getClaim(claimId).call();
+    console.log("Claim Details:", claim);
+}
+
+module.exports = { submitClaim, approveClaim, getClaim };
